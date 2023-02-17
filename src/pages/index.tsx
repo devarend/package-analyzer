@@ -5,8 +5,17 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
 
+const avoidCheckingDependencies = ["react", "react-dom", "next"];
+
 const Home = () => {
+  const [validationStatus, setValidationStatus] = useState<
+    "valid" | "invalid" | null
+  >(null);
+
+  const [packageJSON, setPackageJSON] = useState<string>("");
+
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setPackageJSON(event.target.value);
     try {
       const parsedPackageJSON = JSON.parse(event.target.value);
       if (!("dependencies" in parsedPackageJSON)) {
@@ -19,9 +28,15 @@ const Home = () => {
     }
   };
 
-  const [validationStatus, setValidationStatus] = useState<
-    "valid" | "invalid" | null
-  >(null);
+  const onClick = () => {
+    const { dependencies } = JSON.parse(packageJSON);
+    const dependenciesToCheck = Object.entries(dependencies).filter(
+      ([key]) => !avoidCheckingDependencies.includes(key)
+    );
+    dependenciesToCheck.map(([key, value]) => {
+      console.log(key, value);
+    });
+  };
 
   const valid = validationStatus === "valid";
   const invalid = validationStatus === "invalid";
@@ -45,6 +60,7 @@ const Home = () => {
             </label>
             <div className="mt-1">
               <textarea
+                value={packageJSON}
                 onChange={onChange}
                 id="json"
                 name="json"
@@ -67,6 +83,14 @@ const Home = () => {
                 </>
               )}
             </div>
+            <button
+              type="button"
+              disabled={!valid}
+              onClick={onClick}
+              className="text-white mt-2 bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            >
+              Check dependencies
+            </button>
           </div>
         </div>
       </main>
