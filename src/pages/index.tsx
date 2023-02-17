@@ -5,7 +5,20 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
 
-const avoidCheckingDependencies = ["react", "react-dom", "next"];
+const avoidCheckingDependencies = [
+  "react",
+  "react-dom",
+  "next",
+  "typescript",
+  "eslint",
+  "eslint-config-next",
+];
+
+const shouldCheckDependency = (key: string) => {
+  const avoidCondition =
+    avoidCheckingDependencies.includes(key) || key.startsWith("@types/");
+  return !avoidCondition;
+};
 
 const Home = () => {
   const [validationStatus, setValidationStatus] = useState<
@@ -30,8 +43,8 @@ const Home = () => {
 
   const onClick = () => {
     const { dependencies } = JSON.parse(packageJSON);
-    const dependenciesToCheck = Object.entries(dependencies).filter(
-      ([key]) => !avoidCheckingDependencies.includes(key)
+    const dependenciesToCheck = Object.entries(dependencies).filter(([key]) =>
+      shouldCheckDependency(key)
     );
     dependenciesToCheck.map(([key, value]) => {
       console.log(key, value);
