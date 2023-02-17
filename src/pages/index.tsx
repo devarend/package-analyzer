@@ -4,6 +4,7 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
+import { fetchPackageInformation } from "@/services/bundlePhobiaService";
 
 const avoidCheckingDependencies = [
   "react",
@@ -41,14 +42,18 @@ const Home = () => {
     }
   };
 
-  const onClick = () => {
+  const onClick = async () => {
     const { dependencies } = JSON.parse(packageJSON);
     const dependenciesToCheck = Object.entries(dependencies).filter(([key]) =>
       shouldCheckDependency(key)
     );
-    dependenciesToCheck.map(([key, value]) => {
-      console.log(key, value);
-    });
+
+    const responses = await Promise.allSettled(
+      dependenciesToCheck.map(([key, value]) =>
+        fetchPackageInformation(key, value)
+      )
+    );
+    responses.forEach((result) => console.log(result));
   };
 
   const valid = validationStatus === "valid";
