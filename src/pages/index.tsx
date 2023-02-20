@@ -4,7 +4,11 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
-import { fetchPackageInformation } from "@/services/bundlePhobiaService";
+import {
+  fetchPackageInformation,
+  fetchSimilarPackages,
+} from "@/services/bundlePhobiaService";
+import DependencyResult from "@/components/DependencyResult";
 
 const avoidCheckingDependencies = [
   "react",
@@ -27,6 +31,7 @@ const Home = () => {
   >(null);
 
   const [packageJSON, setPackageJSON] = useState<string>("");
+  const [dependencyResults, setDependencyResults] = useState<any>([]);
 
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setPackageJSON(event.target.value);
@@ -49,11 +54,26 @@ const Home = () => {
     );
 
     const responses = await Promise.allSettled(
-      dependenciesToCheck.map(([key, value]) =>
-        fetchPackageInformation(key, value)
-      )
+      dependenciesToCheck.map(async ([key, value]) => {
+        let item = {
+          packageName: `${key}@${value}`,
+          packageInformation: null,
+          similarPackages: [],
+        };
+        try {
+          item.packageInformation = await fetchPackageInformation(key, value);
+          const { category } = await fetchSimilarPackages(key);
+          if (category.score >= 999) {
+            item.similarPackages = category.similar;
+          }
+          return item;
+        } catch {
+          return item;
+        }
+      })
     );
-    responses.forEach((result) => console.log(result));
+
+    setDependencyResults(responses);
   };
 
   const valid = validationStatus === "valid";
@@ -109,6 +129,43 @@ const Home = () => {
             >
               Check dependencies
             </button>
+          </div>
+
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Package name
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Minified size
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Minified + gzipped
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    <span className="sr-only">Edit</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {dependencyResults.map(({ value }, key) => {
+                  const { packageInformation, packageName, similarPackages } =
+                    value;
+                  return (
+                    <DependencyResult
+                      packageInformation={packageInformation}
+                      packageName={packageName}
+                      similarPackages={similarPackages}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
