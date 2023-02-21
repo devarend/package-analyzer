@@ -53,7 +53,7 @@ const Home = () => {
       shouldCheckDependency(key)
     );
 
-    const responses = await Promise.allSettled(
+    const responses = await Promise.all(
       dependenciesToCheck.map(async ([key, value]) => {
         let item = {
           packageName: `${key}@${value}`,
@@ -72,7 +72,6 @@ const Home = () => {
         }
       })
     );
-
     setDependencyResults(responses);
   };
 
@@ -148,22 +147,26 @@ const Home = () => {
                     Description
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    <span className="sr-only">Edit</span>
+                    Alternatives
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {dependencyResults.map(({ value }, key) => {
-                  const { packageInformation, packageName, similarPackages } =
-                    value;
-                  return (
-                    <DependencyResult
-                      packageInformation={packageInformation}
-                      packageName={packageName}
-                      similarPackages={similarPackages}
-                    />
-                  );
-                })}
+                {dependencyResults.map(
+                  (
+                    { packageInformation, packageName, similarPackages },
+                    key
+                  ) => {
+                    return (
+                      <DependencyResult
+                        key={key}
+                        packageInformation={packageInformation}
+                        packageName={packageName}
+                        similarPackages={similarPackages}
+                      />
+                    );
+                  }
+                )}
               </tbody>
             </table>
           </div>

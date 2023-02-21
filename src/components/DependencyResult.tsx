@@ -16,11 +16,6 @@ const DependencyResult: FC<DependencyResultProps> = ({
       >
         {packageName}
       </th>
-      {!isFulfilled && (
-        <td className="px-6 py-4">
-          Information not available for this package
-        </td>
-      )}
       <td className="px-6 py-4">
         {isFulfilled ? `${(packageInformation.size / 1024).toFixed(1)}kB` : ""}
       </td>
