@@ -79,7 +79,7 @@ const Home = () => {
         }
       })
     );
-    console.log(responses);
+
     setDependencyResults(responses);
   };
 
@@ -162,7 +162,12 @@ const Home = () => {
               <tbody>
                 {dependencyResults.map(
                   (
-                    { packageInformation, packageName, similarPackages },
+                    {
+                      packageInformation,
+                      packageName,
+                      similarPackages,
+                      similarPackagesInformation,
+                    },
                     key
                   ) => {
                     return (
@@ -171,6 +176,7 @@ const Home = () => {
                         packageInformation={packageInformation}
                         packageName={packageName}
                         similarPackages={similarPackages}
+                        similarPackagesInformation={similarPackagesInformation}
                       />
                     );
                   }
