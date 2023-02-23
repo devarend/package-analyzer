@@ -40,23 +40,27 @@ const DependencyResult: FC<DependencyResultProps> = ({
       >
         {packageName}
       </th>
-      <td className="px-6 py-4">{size && `${size}kB`}</td>
-      <td className="px-6 py-4">{gzip && `${gzip}kB`}</td>
+      <td className="px-6 py-4">{size ? `${size}kB` : null}</td>
+      <td className="px-6 py-4">{gzip ? `${gzip}kB` : null}</td>
       <td className="px-6 py-4">{description}</td>
       <td className="px-6 py-4">
         {similarPackages.map((item, key) => {
-          const { gzip } = getSimilarPackageInformation(
+          const { gzip: similarPackageGzip } = getSimilarPackageInformation(
             item,
             similarPackagesInformation
           );
+          const isLowerSize = similarPackageGzip < gzip;
+          const buttonBackground = isLowerSize
+            ? "from-green-400 via-green-500 to-green-600"
+            : "from-red-400 via-red-500 to-red-600";
           return (
             <button
               key={key}
               type="button"
               onClick={() => null}
-              className="text-white mt-2 bg-gradient-to-br from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              className={`text-white mt-2 bg-gradient-to-br ${buttonBackground} hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2`}
             >
-              {item} ({gzip && `${gzip}kB`})
+              {item} {similarPackageGzip ? `(${similarPackageGzip}kB)` : null}
             </button>
           );
         })}
