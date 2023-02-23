@@ -26,7 +26,16 @@ const DependencyResult: FC<DependencyResultProps> = ({
         {isFulfilled ? packageInformation.description : ""}
       </td>
       <td className="px-6 py-4">
-        {isFulfilled ? similarPackages.join(", ") : ""}
+        {similarPackages.map((item, key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => null}
+            className="text-white mt-2 bg-gradient-to-br from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+          >
+            {item}
+          </button>
+        ))}
       </td>
     </tr>
   );

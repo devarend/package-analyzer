@@ -59,12 +59,19 @@ const Home = () => {
           packageName: `${key}@${value}`,
           packageInformation: null,
           similarPackages: [],
+          similarPackagesInformation: {},
         };
         try {
           item.packageInformation = await fetchPackageInformation(key, value);
           const { category } = await fetchSimilarPackages(key);
           if (category.score >= 999) {
             item.similarPackages = category.similar;
+            category.similar.map(async (similarItem) => {
+              try {
+                item.similarPackagesInformation[similarItem] =
+                  await fetchPackageInformation(similarItem);
+              } catch {}
+            });
           }
           return item;
         } catch {
@@ -72,6 +79,7 @@ const Home = () => {
         }
       })
     );
+    console.log(responses);
     setDependencyResults(responses);
   };
 
