@@ -10,6 +10,7 @@ import {
 } from "@/services/bundlePhobiaService";
 import DependencyResult from "@/components/DependencyResult";
 import Header from "@/components/Header/Header";
+import { Item } from "../../types";
 
 const avoidCheckingDependencies = [
   "react",
@@ -32,7 +33,7 @@ const Home = () => {
   >(null);
 
   const [packageJSON, setPackageJSON] = useState<string>("");
-  const [dependencyResults, setDependencyResults] = useState<any>([]);
+  const [dependencyResults, setDependencyResults] = useState<Item[]>([]);
 
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setPackageJSON(event.target.value);
@@ -56,14 +57,17 @@ const Home = () => {
 
     const responses = await Promise.all(
       dependenciesToCheck.map(async ([key, value]) => {
-        let item = {
+        let item: Item = {
           packageName: `${key}@${value}`,
           packageInformation: null,
           similarPackages: [],
           similarPackagesInformation: {},
         };
         try {
-          item.packageInformation = await fetchPackageInformation(key, value);
+          item.packageInformation = await fetchPackageInformation(
+            key,
+            value as string
+          );
           const { category } = await fetchSimilarPackages(key);
           if (category.score >= 999) {
             item.similarPackages = category.similar;
