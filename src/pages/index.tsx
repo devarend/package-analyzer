@@ -9,6 +9,7 @@ import {
   fetchSimilarPackages,
 } from "@/services/bundlePhobiaService";
 import DependencyResult from "@/components/DependencyResult";
+import Header from "@/components/Header/Header";
 
 const avoidCheckingDependencies = [
   "react",
@@ -95,6 +96,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <Header />
         <div className={"p-4"}>
           <div>
             <label
