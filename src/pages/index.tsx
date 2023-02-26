@@ -10,7 +10,7 @@ import {
 } from "@/services/bundlePhobiaService";
 import DependencyResult from "@/components/DependencyResult";
 import Header from "@/components/Header/Header";
-import { Item } from "../../types";
+import { Item, ValidationStatus } from "../../types";
 
 const avoidCheckingDependencies = [
   "react",
@@ -28,9 +28,8 @@ const shouldCheckDependency = (key: string) => {
 };
 
 const Home = () => {
-  const [validationStatus, setValidationStatus] = useState<
-    "valid" | "invalid" | null
-  >(null);
+  const [validationStatus, setValidationStatus] =
+    useState<ValidationStatus>(null);
 
   const [packageJSON, setPackageJSON] = useState<string>("");
   const [dependencyResults, setDependencyResults] = useState<Item[]>([]);

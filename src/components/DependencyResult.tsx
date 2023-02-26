@@ -1,5 +1,9 @@
 import { FC } from "react";
-import { PackageInformation } from "../../types";
+import {
+  PackageInformation,
+  SimilarPackages,
+  SimilarPackagesInformation,
+} from "../../types";
 
 const getPackageInformation = (packageInformation: PackageInformation) => {
   if (!packageInformation) return { size: 0, gzip: 0, description: null };
@@ -13,10 +17,12 @@ const getPackageInformation = (packageInformation: PackageInformation) => {
 
 const getSimilarPackageInformation = (
   item: string,
-  similarPackagesInformation: { [key: string]: PackageInformation }
+  similarPackagesInformation: SimilarPackagesInformation
 ) => {
   if (!(item in similarPackagesInformation)) return { size: 0, gzip: 0 };
-  const { gzip } = similarPackagesInformation[item];
+  const { gzip } = similarPackagesInformation[
+    item
+  ] as NonNullable<PackageInformation>;
   return {
     gzip: (gzip / 1024).toFixed(1),
   };
@@ -72,8 +78,8 @@ const DependencyResult: FC<DependencyResultProps> = ({
 interface DependencyResultProps {
   packageInformation: PackageInformation;
   packageName: string;
-  similarPackages: string[];
-  similarPackagesInformation: { [key: string]: PackageInformation };
+  similarPackages: SimilarPackages;
+  similarPackagesInformation: SimilarPackagesInformation;
 }
 
 export default DependencyResult;
