@@ -4,6 +4,7 @@ export type PackageInformation = null | {
   size: number;
   gzip: number;
   description: string;
+  repository: string;
 };
 
 export type SimilarPackages = [] | string[];

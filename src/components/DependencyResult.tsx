@@ -19,12 +19,14 @@ const getSimilarPackageInformation = (
   item: string,
   similarPackagesInformation: SimilarPackagesInformation
 ) => {
-  if (!(item in similarPackagesInformation)) return { size: 0, gzip: 0 };
-  const { gzip } = similarPackagesInformation[
+  if (!(item in similarPackagesInformation))
+    return { size: 0, gzip: 0, repository: null };
+  const { gzip, repository } = similarPackagesInformation[
     item
   ] as NonNullable<PackageInformation>;
   return {
     gzip: (gzip / 1024).toFixed(1),
+    repository,
   };
 };
 
@@ -37,6 +39,11 @@ const DependencyResult: FC<DependencyResultProps> = ({
   const isFulfilled = !!packageInformation;
   const backgroundColor = isFulfilled ? "bg-white" : "bg-gray-200";
   const { size, gzip, description } = getPackageInformation(packageInformation);
+
+  const onClick = (link: string | null) => {
+    if (!link) return;
+    window.open(link, "_blank");
+  };
 
   return (
     <tr className={`${backgroundColor} border-b hover:bg-gray-50`}>
@@ -51,10 +58,8 @@ const DependencyResult: FC<DependencyResultProps> = ({
       <td className="px-6 py-4">{description}</td>
       <td className="px-6 py-4">
         {similarPackages.map((item, key) => {
-          const { gzip: similarPackageGzip } = getSimilarPackageInformation(
-            item,
-            similarPackagesInformation
-          );
+          const { gzip: similarPackageGzip, repository } =
+            getSimilarPackageInformation(item, similarPackagesInformation);
           const isLowerSize = similarPackageGzip < gzip;
           const buttonBackground = isLowerSize
             ? "from-green-400 via-green-500 to-green-600"
@@ -63,7 +68,7 @@ const DependencyResult: FC<DependencyResultProps> = ({
             <button
               key={key}
               type="button"
-              onClick={() => null}
+              onClick={() => onClick(repository)}
               className={`text-white mt-2 bg-gradient-to-br ${buttonBackground} hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2`}
             >
               {item} {similarPackageGzip ? `(${similarPackageGzip}kB)` : null}
