@@ -8,9 +8,9 @@ import {
   fetchPackageInformation,
   fetchSimilarPackages,
 } from "@/services/bundlePhobiaService";
-import DependencyResult from "@/components/DependencyResult";
 import Header from "@/components/Header/Header";
 import { Item, ValidationStatus } from "../../types";
+import Table from "@/components/Table";
 
 const avoidCheckingDependencies = [
   "react",
@@ -32,7 +32,9 @@ const Home = () => {
     useState<ValidationStatus>(null);
 
   const [packageJSON, setPackageJSON] = useState<string>("");
-  const [dependencyResults, setDependencyResults] = useState<Item[]>([]);
+  const [dependencyResults, setDependencyResults] = useState<Item[] | null>(
+    null
+  );
 
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setPackageJSON(event.target.value);
@@ -144,50 +146,9 @@ const Home = () => {
           </div>
 
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Package name
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Minified size
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Minified + gzipped
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Description
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Alternatives
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {dependencyResults.map(
-                  (
-                    {
-                      packageInformation,
-                      packageName,
-                      similarPackages,
-                      similarPackagesInformation,
-                    },
-                    key
-                  ) => {
-                    return (
-                      <DependencyResult
-                        key={key}
-                        packageInformation={packageInformation}
-                        packageName={packageName}
-                        similarPackages={similarPackages}
-                        similarPackagesInformation={similarPackagesInformation}
-                      />
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
+            {dependencyResults && (
+              <Table dependencyResults={dependencyResults} />
+            )}
           </div>
         </div>
       </main>
