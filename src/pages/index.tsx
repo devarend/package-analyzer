@@ -11,6 +11,7 @@ import {
 import Header from "@/components/Header/Header";
 import { Item, ValidationStatus } from "../../types";
 import Table from "@/components/Table";
+import Loader from "@/components/Loader";
 
 const avoidCheckingDependencies = [
   "react",
@@ -35,6 +36,7 @@ const Home = () => {
   const [dependencyResults, setDependencyResults] = useState<Item[] | null>(
     null
   );
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setPackageJSON(event.target.value);
@@ -51,6 +53,7 @@ const Home = () => {
   };
 
   const onClick = async () => {
+    setIsFetching(true);
     const { dependencies } = JSON.parse(packageJSON);
     const dependenciesToCheck = Object.entries(dependencies).filter(([key]) =>
       shouldCheckDependency(key)
@@ -87,7 +90,7 @@ const Home = () => {
         }
       })
     );
-
+    setIsFetching(false);
     setDependencyResults(responses);
   };
 
@@ -139,13 +142,19 @@ const Home = () => {
             </div>
             <button
               type="button"
-              disabled={!valid}
+              disabled={!valid || isFetching}
               onClick={onClick}
               className="text-white mt-2 bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 disabled:opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
             >
               Check dependencies
             </button>
           </div>
+
+          {isFetching && (
+            <div className="mt-2">
+              <Loader />
+            </div>
+          )}
 
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
             {dependencyResults && (
