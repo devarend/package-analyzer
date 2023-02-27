@@ -72,12 +72,14 @@ const Home = () => {
           const { category } = await fetchSimilarPackages(key);
           if (category.score >= 999) {
             item.similarPackages = category.similar;
-            category.similar.map(async (similarItem) => {
-              try {
-                item.similarPackagesInformation[similarItem] =
-                  await fetchPackageInformation(similarItem);
-              } catch {}
-            });
+            await Promise.all(
+              category.similar.map(async (similarItem) => {
+                try {
+                  item.similarPackagesInformation[similarItem] =
+                    await fetchPackageInformation(similarItem);
+                } catch {}
+              })
+            );
           }
           return item;
         } catch {
