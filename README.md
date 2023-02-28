@@ -11,6 +11,12 @@
 ## Demo
 The package analyzer can be found <a href="https://package-analyzer.vercel.app/" target="_blank">here</a>
 
+## Features
+- Overview of all your packages and package size
+- Shows alternative packages with the corresponding size
+- Different alternative package buttons based on the size of the alternative package and the current package being used (green is smaller in size, red is bigger)
+
+
 ## How To Use
 ```bash
 # Install
