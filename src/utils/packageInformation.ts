@@ -1,4 +1,42 @@
-import { PackageInformation, SimilarPackagesInformation } from "../../types";
+import {
+  Item,
+  PackageInformation,
+  SimilarPackagesInformation,
+} from "../../types";
+import {
+  fetchPackageInformation,
+  fetchSimilarPackages,
+} from "@/services/bundlePhobiaService";
+
+export const fetchInfo = async (key: string, value: string) => {
+  let item: Item = {
+    packageName: `${key}@${value}`,
+    packageInformation: null,
+    similarPackages: [],
+    similarPackagesInformation: {},
+  };
+  try {
+    item.packageInformation = await fetchPackageInformation(
+      key,
+      value as string
+    );
+    const { category } = await fetchSimilarPackages(key);
+    if (category.score >= 999) {
+      item.similarPackages = category.similar;
+      await Promise.all(
+        category.similar.map(async (similarItem) => {
+          try {
+            item.similarPackagesInformation[similarItem] =
+              await fetchPackageInformation(similarItem);
+          } catch {}
+        })
+      );
+    }
+    return item;
+  } catch {
+    return item;
+  }
+};
 
 export const getPackageInformation = (
   packageInformation: PackageInformation
