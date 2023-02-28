@@ -4,29 +4,14 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ChangeEvent, useState } from "react";
-import {
-  fetchPackageInformation,
-  fetchSimilarPackages,
-} from "@/services/bundlePhobiaService";
 import Header from "@/components/Header/Header";
 import { Item, ValidationStatus } from "../../types";
 import Table from "@/components/Table";
 import Loader from "@/components/Loader";
+import { fetchInfo } from "@/utils/packageInformation";
+import { getDependenciesToCheck } from "@/utils/dependency";
 
-const avoidCheckingDependencies = [
-  "react",
-  "react-dom",
-  "next",
-  "typescript",
-  "eslint",
-  "eslint-config-next",
-];
-
-const shouldCheckDependency = (key: string) => {
-  const avoidCondition =
-    avoidCheckingDependencies.includes(key) || key.startsWith("@types/");
-  return !avoidCondition;
-};
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const Home = () => {
   const [validationStatus, setValidationStatus] =
@@ -54,44 +39,17 @@ const Home = () => {
 
   const onClick = async () => {
     setIsFetching(true);
-    const { dependencies } = JSON.parse(packageJSON);
-    const dependenciesToCheck = Object.entries(dependencies).filter(([key]) =>
-      shouldCheckDependency(key)
-    );
+    const dependenciesToCheck = getDependenciesToCheck(packageJSON);
 
-    const responses = await Promise.all(
-      dependenciesToCheck.map(async ([key, value]) => {
-        let item: Item = {
-          packageName: `${key}@${value}`,
-          packageInformation: null,
-          similarPackages: [],
-          similarPackagesInformation: {},
-        };
-        try {
-          item.packageInformation = await fetchPackageInformation(
-            key,
-            value as string
-          );
-          const { category } = await fetchSimilarPackages(key);
-          if (category.score >= 999) {
-            item.similarPackages = category.similar;
-            await Promise.all(
-              category.similar.map(async (similarItem) => {
-                try {
-                  item.similarPackagesInformation[similarItem] =
-                    await fetchPackageInformation(similarItem);
-                } catch {}
-              })
-            );
-          }
-          return item;
-        } catch {
-          return item;
-        }
-      })
-    );
+    let items: Item[] = [];
+    for (const [key, value] of dependenciesToCheck) {
+      const item = await fetchInfo(key, value as string);
+      await sleep(500);
+      items.push(item);
+    }
+
     setIsFetching(false);
-    setDependencyResults(responses);
+    setDependencyResults(items);
   };
 
   const valid = validationStatus === "valid";
